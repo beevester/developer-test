@@ -1,48 +1,90 @@
-<x-admin-layout>
+@extends('layouts.app')
 
-    <div class="flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-        <h1 class="inline-md-block" id="title">Users</h1>
-        <div class="nav-item n active right">
-            <a class="btn btn-sm btn-primary p-5" href="{{route('users.create')}}">Create New User</a>
+@section('content')
+        <div style="margin: 16px">
+            <a class="btn btn-sm btn-primary p-5" onclick="createUser()" data-toggle="modal"
+               data-target="#createModal" style="float: right;">Create
+                New User</a>
         </div>
-    </div>
 
-    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-
-    <div class="responsive-table col-md-12 col-lg-12">
+    <div class="responsive-table col-md-12 col-lg-12" style="margin-top: 30px">
         <table style="width: 100%">
-            <thead>
-            <tr class="table-header">
-                <th class="col-2">First Name</th>
-                <th class="col-2">Last Name</th>
-                <th class="col-4">Email</th>
-                <th class="col-2">Role</th>
-                <th class="col-1">Member since</th>
-            </tr>
-            </thead>
             <tbody>
             @foreach($users as $user)
-                <tr class="table-row"  onclick="window.location='{{ route('users.edit', ['user' => $user]) }}'"  role='button'>
-                    <td class="col-2">{{ $user->first_name }}</td>
-                    <td class="col-2">{{ $user->last_name }}</td>
-                    <td class="col-4">{{ $user->email }}</td>
-                    <td class="col-2">
-                        @foreach($user->roles as $r)
-                            {{$r->display_name}}
-                        @endforeach
-                    </td>
-                    <td class="col-1">
+                <tr class="table-row">
+                    <td class="col-2" onclick="window. window.location='{{ route('users.edit', ['user' => $user]) }}'"
+                        role='button'>{{ $user->name }}</td>
+                    <td class="col-2" onclick="window. window.location='{{ route('users.edit', ['user' => $user]) }}'"
+                        role='button'>{{ $user->email }}</td>
+                    <td class="col-1" data-toggle="modal" data-target="#deleteUser{{ $user->id }}" role='button'>
                         {{ date('d M Y', strtotime($user->updated_at)) }}
                     </td>
                 </tr>
+
+                <div class="modal fade" style="top: 20%" id="deleteUser{{ $user->id }}" tabindex="-1" role="dialog"
+                     aria-labelledby="exampleModalLabel"
+                     aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body" id="create">
+                                <div class="flex-wrap pb-2 mb-8">
+                                    <h1 class="inline-md-block" id="title">{{$user->first_name}}</h1>
+                                </div>
+                                <div class="light-g-bg x">
+                                    <p class="mb-4">Are you sure you want to delete
+                                        <strong>{{$user->name}}</strong>
+                                    </p>
+
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <input type="hidden" name="_token" value="{{ Session::token() }}">
+                                <input name="_method" type="hidden" value="DELETE">
+                                <button type="submit" class="btn btn-danger" onclick="deleteUser({{ $user->id }})">
+                                    Yes I'm sure. Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endforeach
             </tbody>
         </table>
+
+        <div class="modal fade" id="createModal" style="top: 20%" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+        </div>
+
 
         <div id="links">
             {{ $users->links() }}
         </div>
     </div>
-    </div>
-    </div>
-</x-admin-layout>
+    <script>
+        function createUser() {
+            $.ajax({
+                url: '/users/create',
+                type: 'get',
+                success: function (data) {
+                    console.log(data);
+                    $("#createModal").html(data)
+                }
+            })
+        }
+
+        function deleteUser(id) {
+            $.ajax({
+                url: `/users/${id}`,
+                type: 'delete',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function () {
+                    $(`#deleteUser${id}`).modal('hide');
+                    location.reload();
+                }
+            })
+        }
+    </script>
+@endsection()

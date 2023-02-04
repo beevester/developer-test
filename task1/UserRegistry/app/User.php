@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -15,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'first_name', 'last_name', 'email', 'password',
     ];
 
     /**
@@ -26,4 +27,46 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    /**
+     * Many-to-Many relations with Role.
+     *
+     * @return BelongsToMany
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->morphToMany(
+            'App\Role',
+            'user',
+            'role_user',
+            'user_id',
+            'role_id'
+        );
+    }
+
+    /**
+     * Alias to eloquent many-to-many relation's attach() method.
+     *
+     * @param mixed $role
+     * @return static
+     */
+    public function attachRole($role): User
+    {
+        $this->roles()->attach($role->id);
+
+        return $this;
+    }
+
+    /**
+     * Alias to eloquent many-to-many relation's attach() method.
+     *
+     * @param mixed $role
+     * @return static
+     */
+    public function detachRole($role): User
+    {
+        $this->roles()->detach($role->id);
+
+        return $this;
+    }
 }

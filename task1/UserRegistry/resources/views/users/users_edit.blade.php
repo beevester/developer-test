@@ -1,4 +1,5 @@
-<x-admin-layout style="background: #303030;">
+@extends('layouts.app')
+@section('content')
     <a class="btn btn-sm btn-primary" href="{{route('users.index')}}">Back to users</a>
     <div class="flex-wrap flex-md-nowrap align-items-center pb-2 mb-8 border-bottom">
         <h1 class="inline-md-block" id="title">{{$user->first_name}}</h1>
@@ -107,4 +108,4 @@
             </div>
         </form>
     </div>
-</x-admin-layout>
+@endsection()
