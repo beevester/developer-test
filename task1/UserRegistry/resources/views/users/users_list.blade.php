@@ -13,11 +13,11 @@
             @foreach($users as $user)
                 <tr class="table-row">
                     <td class="col-2" onclick="window. window.location='{{ route('users.edit', ['user' => $user]) }}'"
-                        role='button'>{{ $user->name }}</td>
+                        role='button'>{{ $user->first_name }} {{ $user->last_name }}</td>
                     <td class="col-2" onclick="window. window.location='{{ route('users.edit', ['user' => $user]) }}'"
                         role='button'>{{ $user->email }}</td>
                     <td class="col-1" data-toggle="modal" data-target="#deleteUser{{ $user->id }}" role='button'>
-                        {{ date('d M Y', strtotime($user->updated_at)) }}
+                        <i class="fa fa-trash" style="color: red;"></i>
                     </td>
                 </tr>
 
